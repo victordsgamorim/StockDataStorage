@@ -117,7 +117,8 @@ public class StockListAdapter extends RecyclerView.Adapter<StockListAdapter.Stoc
 
         public void bindInformation(Item item) {
             this.item = item;
-            itemId.setText(item.getId());
+            String id = String.valueOf(item.getId());
+            itemId.setText(id);
             itemName.setText(item.getName());
             itemPrice.setText(PriceUtil.priceCurrency(item.getPrice()));
             itemQnt.setText(item.getQuantityString());

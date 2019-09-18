@@ -21,7 +21,7 @@ public interface ItemDAO {
     List<Item> list();
 
     @Query("SELECT * FROM Item WHERE id = :id")
-    Item searchItem(String id);
+    Item searchItem(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void update(Item item);

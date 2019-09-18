@@ -2,9 +2,11 @@ package com.victor.stockpesistentdata.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,7 +34,6 @@ public class FormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form);
 
-        System.out.println("Result");
         initFieldViews();
 
         Intent data = getIntent();
@@ -88,6 +89,7 @@ public class FormActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     private Item getItemInfoFromField() {
         String name = nameField.getText().toString();

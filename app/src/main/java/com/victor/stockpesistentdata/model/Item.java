@@ -1,35 +1,42 @@
 package com.victor.stockpesistentdata.model;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.victor.stockpesistentdata.util.GeneratorIDUtil;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Entity
 public class Item implements Serializable {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
-    private String id;
+    private int id;
+    @NonNull
     private String name;
+    @NonNull
     private BigDecimal price;
+    @NonNull
     private int quantity;
 
     public Item(String name, BigDecimal price, int quantity) {
-        this.id = UUID.randomUUID().toString();
+        this.id = GeneratorIDUtil.generateId();
         this.name = name;
         this.price = price;
         this.quantity = quantity;
     }
 
-    public String getId() {
+
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

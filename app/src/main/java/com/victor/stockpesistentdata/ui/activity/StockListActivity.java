@@ -13,7 +13,13 @@ import com.victor.stockpesistentdata.asynctask.BaseAsyncTask;
 import com.victor.stockpesistentdata.database.StockDatabase;
 import com.victor.stockpesistentdata.database.dao.ItemDAO;
 import com.victor.stockpesistentdata.model.Item;
+import com.victor.stockpesistentdata.retrofit.StockRetrofit;
+import com.victor.stockpesistentdata.retrofit.service.ItemService;
 import com.victor.stockpesistentdata.ui.adapter.StockListAdapter;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.victor.stockpesistentdata.ui.constant.TransferDadaBetweenIntentConstant.ITEM_DATA;
 import static com.victor.stockpesistentdata.ui.constant.TransferDadaBetweenIntentConstant.ITEM_EDIT;
@@ -26,6 +32,7 @@ public class StockListActivity extends AppCompatActivity {
     private StockDatabase database;
     private ItemDAO dao;
     private StockListAdapter adapter;
+    private ItemService itemService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,13 +43,15 @@ public class StockListActivity extends AppCompatActivity {
         database = StockDatabase.getInstance(this);
         dao = database.getItemDAO();
 
+        itemService = new StockRetrofit().getItemService();
+
         /**thread async that search for item on internal db*/
-        new BaseAsyncTask<>(dao::list, adapter::updateList).execute();
 
         configRecyclerView();
         fabAddItemListener();
         adapterListener();
 
+        new BaseAsyncTask<>(dao::list, adapter::updateList).execute();
     }
 
     private void configRecyclerView() {
@@ -90,19 +99,37 @@ public class StockListActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        /**insert item into internal and external storage*/
         if (requestCode == ITEM_REQUEST
                 && resultCode == ITEM_RESULT
                 && data.hasExtra(ITEM_DATA)) {
 
             Item item = (Item) data.getSerializableExtra(ITEM_DATA);
 
-            new BaseAsyncTask<>(() -> {
-                dao.insert(item);
-                return dao.searchItem(item.getId());
+            Call<Item> call = itemService.insert(item);
+            call.enqueue(new Callback<Item>() {
+                @Override
+                public void onResponse(Call<Item> call, Response<Item> response) {
+                    if (response.isSuccessful()) {
+                        Item item = response.body();
+                        if (item != null) {
+                            addItemInternally(item);
+                        } else {
+                            //TODO error after trying to add to Internal Storage
+                        }
+                    }
+                }
 
-            }, adapter::add).execute();
+                @Override
+                public void onFailure(Call<Item> call, Throwable t) {
+                    //TODO Error after trying to connect server to add the item
+                }
+            });
+
+
         }
 
+        /**adeit item from internal and external storage*/
         if (requestCode == ITEM_REQUEST
                 && resultCode == ITEM_RESULT
                 && data.hasExtra(ITEM_EDIT)
@@ -117,5 +144,13 @@ public class StockListActivity extends AppCompatActivity {
             }, result -> adapter.update(position, result)).execute();
 
         }
+    }
+
+    private void addItemInternally(Item item) {
+        new BaseAsyncTask<>(() -> {
+            dao.insert(item);
+            return dao.searchItem(item.getId());
+
+        }, adapter::add).execute();
     }
 }
