@@ -22,7 +22,7 @@ public class StockRetrofit {
                 .build();
 
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.0.73:8080/")
+                .baseUrl("https://4803c84d-02d1-44b0-814b-d25d31dbc327.mock.pstmn.io/")
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

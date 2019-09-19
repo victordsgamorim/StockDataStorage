@@ -17,11 +17,8 @@ public class Item implements Serializable {
     @PrimaryKey(autoGenerate = true)
     @NonNull
     private int id;
-    @NonNull
     private String name;
-    @NonNull
     private BigDecimal price;
-    @NonNull
     private int quantity;
 
     public Item(String name, BigDecimal price, int quantity) {
@@ -68,4 +65,9 @@ public class Item implements Serializable {
         return "Qnt.: " + this.quantity;
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return name;
+    }
 }
